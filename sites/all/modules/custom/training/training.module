@@ -1,0 +1,12 @@
+<?php
+/**
+ *  Implement hook_menu
+ */
+function training_menu() {
+  $menu['training/menu'] = [
+    'page callback' => 'examples_listing',
+    'access arguments' => ['access examples'],
+    'title' => 'Training Landing Page',
+  ];
+  return $menu;
+}
