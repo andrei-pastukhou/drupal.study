@@ -1,12 +1,445 @@
 <?php
 /**
+ * @file training.module
+ */
+/**
+ * Implementation of hook_permission()
+ */
+function training_permission() {
+  return array(
+    // Permission for training/menu/permissioned.
+    'access protected menu example' => array(
+      'title' => t('access protected menu example'),
+      'description' => t('Perform users with this permission view training/menu/permissioned menu.'),
+    ),
+    // Permission for training/theme/access.
+    'access protected content' => array(
+      'title' => t('access protected content'),
+      'description' => t('Perform users with this permission view training/theme/access page.'),
+    ),
+  );
+}
+
+/**
  *  Implement hook_menu
  */
 function training_menu() {
-  $menu['training/menu'] = [
-    'page callback' => 'examples_listing',
-    'access arguments' => ['access examples'],
+  //  1,2) Создать пункт меню с адресом training/menu и с заголовком «Training Landing Page»,
+  //  пункт меню должен находиться в “Navigation” меню. Пункт меню должен быть раскрыт по умолчанию.
+  $items['training/menu'] = array(
+    'page callback' => '_training_landing_page_content',
+    'access callback' => TRUE,//show for unauth/all users
     'title' => 'Training Landing Page',
-  ];
-  return $menu;
+    'expanded' => TRUE,
+  );
+  //  3) Создать пункт меню с адресом training/menu/custom_access и с заголовком «Custom \
+  //  Access Menu Item». Пункт меню должен быть виден только авторизованным пользователям.  Роль «authenticated user».
+  $items['training/menu/custom_access'] = array(
+    'page callback' => '_training_custom_access_page_content',
+    'access callback' => 'user_is_logged_in',// show only for auth users
+    'title' => 'Custom Access Menu Item',
+  );
+
+  //  4) Создать пункт меню с адресом training/menu/permissioned и с заголовком
+  //  «Permissioned Menu Item». Пункт меню должен быть виден только пользователям
+  //  с правом  «access protected menu example».
+  $items['training/menu/permissioned'] = array(
+    'access arguments' => array('access protected menu example'),// show only for  users with access protected menu example
+    'title' => 'Permissioned Menu Item',
+  );
+
+  //  5) Создать пункт меню с адресом training/menu/callback. Этот пункт не должен
+  //  попасть ни в одно меню. На странице должна быть надпись «The menu entry for this page is of type MENU_CALLBACK»
+  $items['training/menu/callback'] = array(
+    'page callback' => '_training_menu_callback_content',
+    'access callback' => TRUE,//show for unauth/all users
+    'title' => 'Page of MENU_CALLBACK',
+    'type' => MENU_CALLBACK,
+  );
+
+  // 6) Создать Пункты меню с табами. Табы начинаются по адресе training/menu/tabs,
+  // заголовок верхнего уровня «Tabs». На странице должна выводиться надпись
+  //  «This is the "tabs" menu entry». У этого должны быть следующие закладки.
+  //  training/menu/tabs/second.
+  //  training/menu/tabs/third
+  //  training/menu/tabs/fourth
+  // Каждая закладка должна выводить текст по шаблону
+  // «This is the tab "%name" in the "basic tabs" example» где %n.
+
+  $items['training/menu/tabs'] = array(
+    'title' => 'Tabs',
+    'page callback' => '_training_tabs_list',
+    'access callback' => TRUE,
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['training/menu/tabs/default'] = array(
+    'title' => 'Tabs',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -1,
+  );
+  $items['training/menu/tabs/second'] = array(
+    'title' => 'Page Tab 2',
+    'access callback' => TRUE,
+    'page callback' => '_training_tabs_view_content',
+    'page arguments' => array('Page Tab 2'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['training/menu/tabs/third'] = array(
+    'title' => 'Page Tab 3',
+    'access callback' => TRUE,
+    'page callback' => '_training_tabs_view_content',
+    'page arguments' => array('Page Tab 3'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['training/menu/tabs/fourth'] = array(
+    'title' => 'Page Tab 4',
+    'access callback' => TRUE,
+    'page callback' => '_training_tabs_view_content',
+    'page arguments' => array('Page Tab 4'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  // 7) В первой закладке открывается новый уровень закладок
+  //  training/menu/tabs
+  // training/menu/tabs/default/second
+  // training/menu/tabs/default/third.
+  $items['training/menu/tabs/default/second'] = array(
+    'title' => 'default/Page Tab 2',
+    'access callback' => TRUE,
+    'page callback' => '_training_tabs_view_content',
+    'page arguments' => array('default/Page Tab 2'),
+    'type' => MENU_LOCAL_TASK,
+    'tab parent' => 'training/menu/tabs/default',
+  );
+  $items['training/menu/tabs/default/third'] = array(
+    'title' => 'default/Page Tab 3',
+    'access callback' => TRUE,
+    'page callback' => '_training_tabs_view_content',
+    'page arguments' => array('default/Page Tab 3'),
+    'type' => MENU_LOCAL_TASK,
+    'tab parent' => 'training/menu/tabs/default',
+  );
+
+  // 8) Создать пункт меню, который может принимать и обрабатывать 2 аргумента.
+  // training/menu/arguments/%1/%2
+  // Сама страница должна печатать эти агрументы
+  // training/menu/arguments/one/two отобразит
+  // Argument 1=one
+  // Argument 2=two.
+  $items['training/menu/arguments'] = array(
+    'title' => 'page with arguments',
+    'access callback' => TRUE,//show for unauth/all users
+    'page callback' => '_training_arguments_view_content',
+    'page arguments' => array(3, 4 ),
+    'type' => MENU_CALLBACK,
+  );
+
+  // 9) Создать страницу с динамическим адресом training/menu/placeholder/%/display.
+  // Страница должна выводить динамический аргумент <div>%</div>
+  $items['training/menu/placeholder/%/display'] = array(
+    'title' => 'page with placeholder',
+    'access callback' => TRUE,//show for unauth/all users
+    'page callback' => '_training_placeholder_arguments_view_content',
+    'page arguments' => array(3, ),
+  );
+
+  // 10) Сделать обработчик аргумента. Страница с шаблоном адреса training/menu/default_arg/%
+  // Должна обрабатывать аргумент и выводить его обработанное значение
+  //  1 => 'one',
+  //  2 => 'two',
+  //  3 => 'three',
+  //  99 => 'Almost there'
+  // При других значениях аргумента должна показываться страница 404.
+  $items['training/menu/default_arg/%default_arg'] = array(
+    'title' => 'page with default_arg',
+    'access callback' => TRUE,//show for unauth/all users
+    'page callback' => '_training_defaults_arguments_view_content',
+    'page arguments' => array(3 , ),
+
+  );
+  //  11)   Создать страницу по адресу training/menu/title с динамическим заголовком
+  //  по шаблону “Dynamic title: username= %username”. Где %username – имя залогиненого
+  //  пользователя, для анонима выводить  anonymous.
+  $items['training/menu/title'] = array(
+    'page callback' => '_training_menu_title_content',
+    'access callback' => TRUE,//show for unauth/all users
+    'title callback' => '_training_menu_title_callback',
+
+  );
+  // Создать пункт меню training/menu/main с заголовком “Item in main menu” которое
+  // будет размещено в главном меню (main-menu).
+  $items['training/menu/main'] = array(
+    'title' => 'Item in main menu',
+    'page callback' => '_training_menu_main_content',
+    'access callback' => TRUE,
+    'menu_name' => 'main-menu',  // This is the changed line.
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  //  Themes
+  // 1	Создать пункт меню “training/theme”, на странице отобразить нумерованны список
+  // из ссылок на все страницы проверки тем:
+  // ○	theme/list - List
+  // ○	theme/table - Table
+  // ○	theme/image - image
+  // ○	theme/access - Access
+  // Заголовок списка - “Links to themes”.
+  $items['training/theme'] = array(
+    'page callback' => '_training_theme_content',
+    'access callback' => TRUE,//show for unauth/all users
+    'title' => 'Themes',
+    //'file' => 'theme.pages.inc',
+  );
+
+  // Themes
+  // 2	Создать страницу training/theme/table и отобразить таблицу с 3мя колонками.
+  // ○	Заголовк таблицы “Theme table sample”, айдишник “table-test”.
+  // ○	Заголовки столбцов “header 1”, “header 2”, “header 3”.
+  // ○	У строк должен быть класс “rowClass” и черестрочное “even”-“odd”.
+  // ○	Вторая ячейка должна занимать 2 ячейки.
+  $items['training/theme/table'] = array(
+    'page callback' => '_training_theme_table_content',
+    'access callback' => TRUE,//show for unauth/all users
+    'title' => 'Themes table',
+    'type' => MENU_CALLBACK,
+  );
+
+  // Themes
+  // 3	Создать страницу training/theme/image и отобразить следующие картинки
+  // ○	modules/image/sample.png с классом simple-image
+  // ○	Применить все доступные стили изображения к этой картинке и вывести их списком
+  $items['training/theme/image'] = array(
+    'page callback' => '_training_theme_image_content',
+    'access callback' => TRUE,//show for unauth/all users
+    'title' => 'Themes Image',
+    'type' => MENU_CALLBACK,
+  );
+
+  // 4	Создать страницу training/theme/access и отобразить следующий текст
+  // ○	“Custom access for rendered content” для пользователей у которых есть право
+  //  “access protected content”.
+  // ○	“Custom access inversed for rendered content” для пользователей у которых нет
+  //  права “access protected content”.
+  $items['training/theme/access'] = array(
+    'page callback' => '_training_theme_access_content',
+    'access callback' => TRUE,//show for unauth/all users
+    'title' => 'Themes Image',
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+//==============================================================================
+/**
+ * Call back functions
+ */
+// Return html page for training/menu.
+function _training_landing_page_content() {
+  return t('This is the landing page of the Training module') ;
+}
+
+// Return html page for training/menu/custom_access.
+function _training_custom_access_page_content() {
+  return t('custom_access_page_content');
+}
+
+// Return html page for training/menu/callback.
+function _training_menu_callback_content() {
+  return t('The menu entry for this page is of type MENU_CALLBACK');
+}
+
+// Return html page for training/menu/tabs.
+function _training_tabs_list() {
+  return t('This is the tabs menu entry');
+}
+
+// Return html page for training/menu/tabs/%tab_number.
+function _training_tabs_view_content($tab_name) {
+  return t('This is the tab  @tab_name  in the "basic tabs" example', array(
+      '@tab_name' => $tab_name,
+    )
+  );
+}
+
+// Return html page for training/menu/arguments/%1/%2.
+function _training_arguments_view_content($argument_1, $argument_2) {
+  return t('Argument 1=@argument_1</br>Argument 2=@argument_2',array(
+      '@argument_1' => $argument_1,
+      '@argument_2' => $argument_2,
+    )
+  );
+}
+
+// Return html page for training/menu/placeholder/%/display.
+function _training_placeholder_arguments_view_content($argument_1) {
+  return t('<div>@argument_1</div>',array(
+    '@argument_1' => $argument_1)
+  );
+}
+
+// Prepeare default_arg variable in training/menu/default_arg/%default_arg.
+function default_arg_load($val) {
+  // 1 => 'one',
+  //  2 => 'two',
+  //  3 => 'three',
+  //  99 => 'Almost there'
+  switch ($val) {
+    case 1 :
+      return 'one';
+    case 2 :
+      return 'two';
+    case 3 :
+      return 'tree';
+    case 99 :
+      return 'almost here';
+    default :
+      return FALSE;
+  }
+}
+
+// Return html page for training/menu/default_arg/%default_arg.
+function _training_defaults_arguments_view_content($val) {
+  if (empty($val)) {
+    drupal_not_found();
+  }
+  return $val;
+}
+
+// Return html page for training/menu/title.
+function _training_menu_title_content() {
+  return t('training_menu_title_content');
+}
+// Return dynamic titlte to  training/menu/title.
+function _training_menu_title_callback() {
+  global $user;
+  if (user_is_logged_in()) {
+    $user_name = $user->name;
+  }
+  else {
+    $user_name = 'anonymous';
+  }
+  return t('Dynamic title: username=@username',
+    array(
+      '@username' => $user_name,
+    )
+  );
+}
+
+// Return html page training/menu/main.
+function _training_menu_main_content() {
+  return t("Content of main_menu link");
+}
+
+// Return html page for training/theme.
+function _training_theme_content() {
+
+  $parametr_ar = array(
+    theme_link(array('path' => 'training/theme/list',
+      'text' => 'List',
+      'options' => array(
+        'attributes' => array(),
+        'html' => FALSE,
+        ),
+      )
+    ),
+    theme('link', array('path' => 'training/theme/table',
+      'text' => 'Table',
+      'options' => array(
+        'attributes' => array(),
+        'html' => FALSE,
+      ),)),
+    theme('link', array('path' => 'training/theme/image',
+      'text' => 'Image',
+      'options' => array(
+        'attributes' => array(),
+        'html' => FALSE,
+      ),)),
+    theme('link', array('path' => 'training/theme/access',
+      'text' => 'Access',
+      'options' => array(
+        'attributes' => array(),
+        'html' => FALSE,
+      ),)),
+  );
+
+  return theme('item_list',array(
+    'items' => $parametr_ar,
+    'type' => 'ol',
+    'title' => 'Links to themes',
+  ));
+}
+
+// Return html page for training/theme.
+function _training_theme_table_content() {
+  //header of table
+  $header_table = array(
+    'header 1',
+    'header 2',
+    'header 3',
+  );
+  //html attributes for every row.
+  $row_attributes = array(
+    'class' => array('rowClass'),
+    'no_striping' => FAlSE,
+  );
+  //array with content of table
+  $rows_table = array(
+    array(
+      'data' => array('row_1 col_1','row_1 col_2','row_1 col_3'),
+    ) + $row_attributes,
+    array(
+      'data' => array('row_2 col_1', array('data' => 'row_2 col_2 collspan=2', 'colspan' => 2)),
+    ) + $row_attributes,
+    array(
+      'data' => array('row_3 col_1','row_3 col_2','row_3 col_3'),
+    ) + $row_attributes,
+
+  );
+  return theme('table',array(
+    'caption' => 'Theme table sample',
+    'attributes' => array('id' => 'table-test'),
+    'header' => $header_table,
+    'rows' => $rows_table,
+  ));
+}
+
+// Return html page for training/theme/image.
+function _training_theme_image_content() {
+  $imgs_ar = array();
+  foreach (module_implements('image_default_styles') as $module) {
+    $module_styles = module_invoke($module, 'image_default_styles');
+    foreach ($module_styles as $style_name => $parametrs) {
+      $imgs_ar[] = $style_name . '</br>' . theme('image_style', array(
+        'style_name' => $style_name,
+        'path' => '/modules/image/sample.png',
+        'getsize' => TRUE,
+        )
+      );
+    }
+  }
+  return
+    theme(
+    'image_style',
+      array(
+        'style_name' => 'large',
+        'path' => '/modules/image/sample.png',
+        'getsize' => TRUE,
+        'attributes' => array('class' => 'simple-image')
+      )
+    ) . '</br>' .
+    theme('item_list',
+      array(
+        'items' => $imgs_ar,
+        'type' => 'ol',
+        'title' => 'Img with different class',
+      )
+    );
+}
+
+// Return html page for training/theme/access.
+function _training_theme_access_content() {
+  if (user_access('access protected content')) {
+    return t('Custom access for rendered content');
+  }
+  return t('Custom access inversed for rendered content');
 }
