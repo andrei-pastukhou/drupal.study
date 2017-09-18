@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6689a3f4-73a0-46ea-a0fe-5050d64c285e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sites/all/modules/custom/training/training.module" afterPath="$PROJECT_DIR$/sites/all/modules/custom/training/training.module" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sites/all/themes/training/block--user--login.tpl.php" afterPath="$PROJECT_DIR$/sites/all/themes/training/block--user--login.tpl.php" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -19,84 +19,32 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="bootstrap.inc" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/includes/bootstrap.inc">
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1451">
-              <caret line="3851" column="0" lean-forward="true" selection-start-line="3851" selection-start-column="0" selection-end-line="3851" selection-end-column="0" />
-              <folding>
-                <marker date="1498069218000" expanded="true" signature="29160:29225" ph="SELECT filen... system" />
-                <marker date="1498069218000" expanded="true" signature="41707:41741" ph="SELECT name,... variable" />
-                <marker date="1498069218000" expanded="true" signature="77381:77423" ph="SELECT 1 FRO... blocked_ips" />
-                <marker date="1498069218000" expanded="true" signature="106820:106875" ph="SELECT * FRO... languages" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="training.module" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/sites/all/modules/custom/training/training.module">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1669">
-              <caret line="312" column="42" lean-forward="false" selection-start-line="312" selection-start-column="42" selection-end-line="312" selection-end-column="42" />
-              <folding>
-                <element signature="e#6#38#0#PHP" expanded="true" />
-                <element signature="n#_training_landing_page_content#0;n#!!top" expanded="false" />
-                <element signature="n#_training_tabs_view_content#0;n#!!top" expanded="false" />
-                <element signature="n#_training_arguments_view_content#0;n#!!top" expanded="false" />
-                <element signature="n#_training_menu_title_callback#0;n#!!top" expanded="false" />
-                <element signature="n#_training_menu_main_content#0;n#!!top" expanded="false" />
-                <element signature="n#_training_theme_content#0;n#!!top" expanded="false" />
-                <element signature="n#_training_theme_table_content#0;n#!!top" expanded="false" />
-                <element signature="n#_training_theme_image_content#0;n#!!top" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="image.module" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/modules/image/image.module">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="181">
-              <caret line="1367" column="9" lean-forward="false" selection-start-line="1367" selection-start-column="9" selection-end-line="1367" selection-end-column="9" />
+            <state relative-caret-position="150">
+              <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="image.admin.inc" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/modules/image/image.admin.inc">
+      <file leaf-file-name="training2.info" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sites/all/modules/custom/training2/training2.info">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-89">
-              <caret line="663" column="9" lean-forward="false" selection-start-line="663" selection-start-column="9" selection-end-line="663" selection-end-column="9" />
+            <state relative-caret-position="90">
+              <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="theme.inc" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/includes/theme.inc">
+      <file leaf-file-name="block--user--login.tpl.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/sites/all/themes/training/block--user--login.tpl.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="218">
-              <caret line="1879" column="0" lean-forward="true" selection-start-line="1879" selection-start-column="0" selection-end-line="1879" selection-end-column="0" />
-              <folding>
-                <marker date="1498069218000" expanded="true" signature="89017:89054" ph="..." />
-                <marker date="1498069218000" expanded="true" signature="89614:89620" ph=" " />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="module.inc" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/includes/module.inc">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="173">
-              <caret line="678" column="9" lean-forward="false" selection-start-line="678" selection-start-column="9" selection-end-line="678" selection-end-column="9" />
-              <folding>
-                <marker date="1498069218000" expanded="true" signature="4469:4589" ph="SELECT name,... system" />
-                <marker date="1498069218000" expanded="true" signature="5939:6048" ph="SELECT * FRO... system" />
-                <marker date="1498069218000" expanded="true" signature="15791:15854" ph="SELECT statu... system" />
-              </folding>
+            <state relative-caret-position="330">
+              <caret line="22" column="0" lean-forward="true" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -140,8 +88,10 @@
         <option value="$PROJECT_DIR$/authorize.php" />
         <option value="$PROJECT_DIR$/.htaccess" />
         <option value="$PROJECT_DIR$/update.php" />
-        <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/sites/all/modules/custom/training/training.module" />
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/sites/all/modules/custom/training2/training2.info" />
+        <option value="$PROJECT_DIR$/sites/all/themes/training/block--user--login.tpl.php" />
       </list>
     </option>
   </component>
@@ -217,106 +167,46 @@
               <item name="drupal.study" type="b2602c69:ProjectViewProjectNode" />
               <item name="drupal.study" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="sites" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="default" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="all" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
             <path>
               <item name="drupal.study" type="b2602c69:ProjectViewProjectNode" />
               <item name="drupal.study" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="sites" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="default" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="files" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="drupal.study" type="b2602c69:ProjectViewProjectNode" />
-              <item name="drupal.study" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="sites" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="default" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="files" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="styles" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="drupal.study" type="b2602c69:ProjectViewProjectNode" />
-              <item name="drupal.study" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="sites" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="default" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="files" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="styles" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="large" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="drupal.study" type="b2602c69:ProjectViewProjectNode" />
-              <item name="drupal.study" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="sites" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="default" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="files" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="styles" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="large" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="public" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="drupal.study" type="b2602c69:ProjectViewProjectNode" />
-              <item name="drupal.study" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="sites" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="default" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="files" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="styles" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="large" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="public" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="all" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="modules" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
             <path>
               <item name="drupal.study" type="b2602c69:ProjectViewProjectNode" />
               <item name="drupal.study" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="sites" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="default" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="files" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="styles" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="large" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="public" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="all" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="modules" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="image" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="custom" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
             <path>
               <item name="drupal.study" type="b2602c69:ProjectViewProjectNode" />
               <item name="drupal.study" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="sites" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="default" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="files" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="styles" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="thumbnail" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="drupal.study" type="b2602c69:ProjectViewProjectNode" />
-              <item name="drupal.study" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="sites" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="default" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="files" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="styles" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="thumbnail" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="public" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="drupal.study" type="b2602c69:ProjectViewProjectNode" />
-              <item name="drupal.study" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="sites" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="default" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="files" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="styles" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="thumbnail" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="public" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="all" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="modules" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="custom" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="training2" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
             <path>
               <item name="drupal.study" type="b2602c69:ProjectViewProjectNode" />
               <item name="drupal.study" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="sites" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="default" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="files" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="styles" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="thumbnail" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="public" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="modules" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="image" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="all" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="themes" type="2a2b976b:PhpTreeStructureProvider$1" />
+            </path>
+            <path>
+              <item name="drupal.study" type="b2602c69:ProjectViewProjectNode" />
+              <item name="drupal.study" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="sites" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="all" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="themes" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="training" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
           </expand>
           <select />
@@ -360,42 +250,42 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="21660000" />
+    <option name="totallyTimeSpent" value="22494000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="344" y="96" width="1400" height="960" extended-state="0" />
+    <frame x="-8" y="-8" width="1696" height="1026" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28540462" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3293979" sideWeight="0.47904626" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3293979" sideWeight="0.5209538" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16011904" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.026286965" sideWeight="0.50714284" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.026286965" sideWeight="0.49285713" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293979" sideWeight="0.49710983" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3289183" sideWeight="0.50477326" order="10" side_tool="true" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Command Line Tools Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3289183" sideWeight="0.49522674" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18072289" sideWeight="0.49464285" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3293979" sideWeight="0.47904626" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Command Line Tools Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3289183" sideWeight="0.49522674" order="16" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="17" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="18" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.41288784" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28540462" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -409,25 +299,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/misc/ajax.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="29" lean-forward="false" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/misc/jquery.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-585">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/misc/help.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/misc/jquery.ba-bbq.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -439,7 +310,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -552,7 +422,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -675,7 +544,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -683,14 +551,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="7" selection-end-column="5" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -746,17 +606,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2566">
           <caret line="238" column="3" lean-forward="true" selection-start-line="238" selection-start-column="3" selection-end-line="238" selection-end-column="3" />
-          <folding>
-            <marker date="1498069218000" expanded="true" signature="8918:8968" ph="SELECT bid, block_custom" />
-            <marker date="1498069218000" expanded="true" signature="9722:9778" ph="SELECT body,... block_custom" />
-            <marker date="1498069218000" expanded="true" signature="19219:19264" ph="SELECT * FRO... block_custom" />
-            <marker date="1498069218000" expanded="true" signature="21487:21696" ph="SELECT DISTI... block" />
-            <marker date="1498069218000" expanded="true" signature="23693:23735" ph="SELECT 1 FRO... block" />
-            <marker date="1498069218000" expanded="true" signature="24004:24046" ph="SELECT * FRO... block" />
-            <marker date="1498069218000" expanded="true" signature="25981:26044" ph="SELECT * FRO... block" />
-            <marker date="1498069218000" expanded="true" signature="27441:27484" ph="SELECT modul... " />
-            <marker date="1498069218000" expanded="true" signature="35494:35555" ph="SELECT name system" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -828,7 +678,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="181">
           <caret line="1367" column="9" lean-forward="false" selection-start-line="1367" selection-start-column="9" selection-end-line="1367" selection-end-column="9" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -847,6 +696,38 @@
             <element signature="n#_training_theme_table_content#0;n#!!top" expanded="false" />
             <element signature="n#_training_theme_image_content#0;n#!!top" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sites/all/modules/custom/training2/training2.info">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sites/all/modules/custom/training2/templates/block-user-0.tpl.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sites/all/themes/training/block--user--login.tpl.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="22" column="0" lean-forward="true" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

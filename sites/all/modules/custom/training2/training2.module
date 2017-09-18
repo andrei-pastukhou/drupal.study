@@ -1,0 +1,201 @@
+<?php
+/**
+ * @file training2.module
+ */
+
+
+/**
+ * ======================TASK2_1===============================================
+ */
+/**
+ * Implements hook_block_info().
+ */
+function training2_block_info() {
+  $blocks['training2_currency'] = array(
+    'info' => t('Block with currency of BNB'),
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+  return $blocks;
+}
+/**
+ * Implements hook_block_configure().
+ */
+
+function training2_block_configure() {
+  $settings = _training2_get_settings();
+  $currency_names = _training2_load_from_cache('training2_currency_name');
+  // Debug information.
+  // dsm($currency_names);
+  // dsm($settings);
+  $form = array();
+  $form['training2_currency_update_time'] = array(
+    '#type'	=> 'textfield',
+    '#title' => t('Update every ... sec'),
+    '#default_value' => $settings['training2_currency_update_time'],
+  );
+  $form['training2_currency']['currency_checked'] = array(
+    '#type' => 'checkboxes',
+    '#options' => $currency_names->data,
+    '#title' => t('Check necessary currency to show'),
+    '#default_value' =>  $settings['currency_checked'],
+    );
+
+  return $form;
+}
+/**
+ * Implements hook_block_save().
+ */
+function training2_block_save($delta = '', $edit = array()) {
+
+  $settings = array(
+    'training2_currency_update_time' => $edit['training2_currency_update_time'],
+    'currency_checked' => $edit['currency_checked'],
+  );
+  variable_set('training2_settings', $settings);
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function training2_block_view() {
+  // Take necessary information from cache.
+  $currency_names = _training2_load_from_cache('training2_currency_name');
+  $currency_rates = _training2_load_from_cache('training2_currency_rate');
+  // Take settings.
+  $settings = _training2_get_settings();
+  // Header of table.
+  $header_table = array(
+    t('Currency'),
+    t('Rate'),
+  );
+  // Html attributes for every row.
+  $row_attributes = array(
+    'class' => array('rowClass'),
+    'no_striping' => FAlSE,
+  );
+  // Create and fill information to row of table.
+  $rows_table = array();
+  foreach ($settings['currency_checked'] as $key => $value) {
+    if(! empty($value)) {
+      $rows_table[] =  array(
+        'data' => array($currency_names->data[$key],$currency_rates->data[$key]),
+      ) + $row_attributes;
+    }
+  }
+  // Create array of necessary information to use theme('table').
+  $data = array();
+  $data['subject'] = t('Currency of BNB');
+  $data['content'] = theme('table',array(
+    'caption' => t('currency last updated @data_time', array(
+        '@data_time' => format_date($currency_names->created,'short'),
+      )
+    ),
+    'attributes' => array('id' => 'table-test'),
+      'header' => $header_table,
+      'rows' => $rows_table,
+    )
+  );
+  return $data;
+}
+
+/**
+ * @return bool
+ * Function to load XML file from http://www.nbrb.by/Services/XmlExRates.aspx
+ * and prepare this information to use.
+ * Function put to cash 2 arrays, one of them consist names of currency,
+ * second consist rate. In each array key is number of currency (take from xml file,
+ * and this number is uniq for each currency)
+ */
+function _training2_update_cache_variable() {
+  $currency_name_ar = array();
+  $currency_rate_ar = array();
+  $settings = _training2_get_settings();
+
+  // Load XML File.
+  $kursi = @simplexml_load_file('http://www.nbrb.by/Services/XmlExRates.aspx');
+  if ($kursi != FALSE) {
+    // Prepare array to put its to cache.
+    foreach ($kursi->Currency as $Currency) {
+      $currency_name_ar[(int) $Currency->NumCode] = (string) $Currency->CharCode;
+      $currency_rate_ar[(int) $Currency->NumCode] = (float) $Currency->Rate;
+    }
+  }
+  else {
+    return FALSE;
+  }
+  cache_set('training2_currency_name',$currency_name_ar,'cache', time() + (int) $settings['training2_currency_update_time']);
+  cache_set('training2_currency_rate',$currency_rate_ar,'cache', time() + (int) $settings['training2_currency_update_time']);
+  return TRUE;
+}
+
+/**
+ * @return array
+ * Function return array with settings. If no any changes before function return
+ * array with default settings. Also this function save default setting per variable_set
+ * if this variable is empty.
+ */
+function _training2_get_settings() {
+  // Default settings if not change any time.
+  $default_setting = array(
+    'training2_currency_update_time' => 60,
+    'currency_checked' => array(978, 643, 840),
+  );
+  $settings = variable_get('training2_settings');
+  if(empty ($settings)) {
+    $settings = $default_setting;
+    variable_set('training2_settings', $settings);
+  }
+  return $settings;
+}
+
+/**
+ * @return array/bool
+ * Function return cache variable. If cache variable don't exist than try to define it,
+ * if can't return FALSE and show drupal error message.
+ */
+function _training2_load_from_cache($variable_name) {
+  $cache = cache_get($variable_name, 'cache');
+  if(empty($cache)){
+    if(_training2_update_cache_variable()) {
+      $cache = cache_get($variable_name, 'cache');
+    }
+    else{
+      drupal_set_message(t('there is an error, reload page!','error'));
+      return FALSE;
+    }
+  }
+  return $cache;
+}
+
+
+/**
+ * ========================TASK2.2==============================================
+ */
+
+/**
+ * Implements hook_form_alter().
+ */
+function training2_form_user_login_block_alter(&$form, &$form_state, $form_id) {
+  // Settings of token auth.
+  $user_to_login = array(
+    'uid' => 1, // User's ID to auth.
+    'token' => 'sim', // Token to auth without login and pass.
+  );
+  $form['secret_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('secret key'),
+    '#size' => 15,
+    '#suffix' => t('To enter use <strong>@token</strong>', array(
+        '@token' =>  $user_to_login['token'],
+      )
+    ),
+  );
+  if(! empty($form_state['input']['secret_key']) and $form_state['input']['secret_key'] == $user_to_login['token']) {
+    // Also can use next code:
+    // global $user;
+    // $user =  load_user(1);
+    // user_login_finalize($user);
+    user_login_submit(array(), $user_to_login);
+    drupal_goto(current_path(), array('query' => drupal_get_query_parameters()));
+  }
+}
