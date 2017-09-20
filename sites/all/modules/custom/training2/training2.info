@@ -1,0 +1,6 @@
+name = "training2"
+description = "training module for task 2 (curency and modificate login form)"
+core = 7.x
+dependecies[] = user
+version  = 1.0
+package = "Training"
