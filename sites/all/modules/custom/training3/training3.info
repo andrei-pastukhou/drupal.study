@@ -1,0 +1,7 @@
+name = "training3"
+description = "training module for task 3"
+core = 7.x
+dependecies[] = user
+dependecies[] = ctools
+version  = 1.0
+package = "Training"
