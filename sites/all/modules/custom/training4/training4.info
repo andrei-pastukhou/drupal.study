@@ -1,0 +1,7 @@
+name = "training4"
+description = "training module for task 4"
+core = 7.x
+dependecies[] = user
+dependecies[] = entity
+version  = 1.0
+package = "Training"

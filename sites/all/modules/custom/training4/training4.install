@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function training4_schema() {
+  $schema['training4_table'] = array(
+    'description' => 'Table of database for module training4',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "Uniq identeficator",
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => "Id of user, who add a record",
+      ),
+      'type' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => "un understand, but this is require of task #4",
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => 100,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => "Title of adding record",
+      ),
+      'body' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+        'description' => "Text of adding record",
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+
+  return $schema;
+}
+
