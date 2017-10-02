@@ -23,30 +23,42 @@ function training2_block_info() {
  */
 function training2_block_configure() {
   $settings = variable_get('training2_settings');
-  $currency_names =  array(); // Variable to generate checkboxes.
-  $form = array(); // Array to custom block configure menu.
-  // Load cache.
-  $currency_cache = _training2_load_from_cache('training2_currency');
-  // Prepare array for use to generate chekboxes.
-  foreach ($currency_cache->data as $num_code => $val_ar) {
-    $currency_names[$num_code] = $val_ar['CharCode'];
+
+  if (empty ($settings)) {
+    drupal_set_message(t('Error to get variable with settings, please reinstall module'), 'error');
+    return FALSE;
   }
-  $form['training2_currency_update_time'] = array(
-    '#type'	=> 'textfield',
-    '#title' => t('Update every ... sec'),
-    '#default_value' => $settings['training2_currency_update_time'],
-  );
-  $form['training2_currency']['currency_checked'] = array(
-    '#type' => 'checkboxes',
-    '#options' => $currency_names,
-    '#title' => t('Check necessary currency to show'),
-    '#default_value' => $settings['currency_checked'],
+  $currency_names = array(); // Variable to generate checkboxes.
+  // Load cache.
+  $currency_cache = _training2_load_from_cache();
+  if ($currency_cache) {
+    // Prepare array for use to generate checkboxes.
+    foreach ($currency_cache->data as $num_code => $val_ar) {
+      $currency_names[$num_code] = $val_ar['CharCode'];
+    }
+    $form['training2_currency_update_time'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Update every ... sec'),
+      '#default_value' => $settings['training2_currency_update_time'],
     );
-  return $form;
+    $form['training2_currency']['currency_checked'] = array(
+      '#type' => 'checkboxes',
+      '#options' => $currency_names,
+      '#title' => t('Check necessary currency to show'),
+      '#default_value' => $settings['currency_checked'],
+    );
+    return $form;
+  }
+  else {
+    drupal_set_message(t('there is an error, reload page!'), 'error');
+    return FALSE;
+  }
 }
 
 /**
  * Implements hook_block_save().
+ * @param $delta
+ * @param $edit
  */
 function training2_block_save($delta = '', $edit = array()) {
 
@@ -62,9 +74,13 @@ function training2_block_save($delta = '', $edit = array()) {
  */
 function training2_block_view() {
   // Take necessary information from cache.
-  $currency = _training2_load_from_cache('training2_currency');
+  $currency = _training2_load_from_cache();
   // Take settings.
-  $settings = variable_get('training2_settings');;
+  $settings = variable_get('training2_settings');
+  if (!$currency || !$settings) {
+    drupal_set_message(t('Can not load a cache or settings!'), 'error');
+    return FALSE;
+  }
   // Header of table.
   $header_table = array(
     t('Currency'),
@@ -73,57 +89,36 @@ function training2_block_view() {
   // Html attributes for every row.
   $row_attributes = array(
     'class' => array('rowClass'),
-    'no_striping' => FAlSE,
+    'no_striping' => FALSE,
   );
   // Create and fill information to row of table.
   $rows_table = array();
   foreach ($settings['currency_checked'] as $key => $value) {
 
-    if (! empty($value)) {
+    if (!empty($value)) {
       $rows_table[] = array(
-        'data' => array(
-          $currency->data[$key]['CharCode'],
-          $currency->data[$key]['Rate'],
-        ),
-      ) + $row_attributes;
+          'data' => array(
+            $currency->data[$key]['CharCode'],
+            $currency->data[$key]['Rate'],
+          ),
+        ) + $row_attributes;
     }
   }
   // Create array of necessary information to use theme('table').
   $data = array();
   $data['subject'] = t('Currency of BNB');
-  $data['content'] = theme('table',array(
-    'caption' => t('currency last updated @data_time', array(
-        '@data_time' => format_date($currency->created, 'short'),
-      )
-    ),
-    'attributes' => array('id' => 'table-test'),
-    'header' => $header_table,
-    'rows' => $rows_table,
+  $data['content'] = theme('table', array(
+      'caption' => t('currency last updated @data_time', array(
+          '@data_time' => format_date($currency->created, 'short'),
+        )
+      ),
+      'attributes' => array('id' => 'table-test'),
+      'header' => $header_table,
+      'rows' => $rows_table,
     )
   );
+
   return $data;
-}
-
-/**
- * Implements hook_install().
- */
-function training2_install() {
-  // Default settings if not change any time.
-  $default_setting = array(
-    // Default time to update cache.
-    'training2_currency_update_time' => 60,
-    // Default numcode to show rates. Use next syntax 'numcode' => 'numcode' to enable,
-    // 'numcode' => 0 to disable.
-    'currency_checked' => array('978' => '978', '643' => '643', '840' => '840'),
-  );
-  variable_set('training2_settings', $default_setting);
-}
-
-/**
- * Implements hook_uninstall().
- */
-function training2_uninstall() {
-  variable_del('training2_settings');
 }
 
 /**
@@ -131,43 +126,26 @@ function training2_uninstall() {
  * Function to load XML file from http://www.nbrb.by/Services/XmlExRates.aspx
  * and prepare this information to use.
  * Function put to cash 2 arrays, one of them consist names of currency,
- * second consist rate. In each array key is number of currency (take from xml file,
- * and this number is uniq for each currency)
+ * second consist rate. In each array key is number of currency (take from xml
+ *   file, and this number is unique for each currency)
  */
 function _training2_update_cache_variable() {
-  $currency_ar = array();
   $settings = variable_get('training2_settings');
   $url = 'http://www.nbrb.by/Services/XmlExRates.aspx';
-  // Load XML File.
-  $result = drupal_http_request($url);
-  if ($result->status_message == 'OK') {
-    $kursi_xml = simplexml_load_string($result->data);
-    // Prepare array to put its to cache.
-    foreach ($kursi_xml->Currency as $Currency) {
-      $currency_ar[(int) $Currency->NumCode] = array(
-        'CharCode' => (string) $Currency->CharCode,
-        'Rate' => (float) $Currency->Rate,
-      );
-    }
+  $currency_ar = training2_http_get_currency_ar($url);
+  if ($currency_ar) {
+    cache_set('training2_currency', $currency_ar, 'cache', REQUEST_TIME + (int) $settings['training2_currency_update_time']);
+    return TRUE;
   }
   else {
-    drupal_set_message(
-      t('Error to connect to @url with message @err',
-        array(
-          '@err' => $result->status_message,
-          '@url' => $url,
-        )
-      ), 'error');
     return FALSE;
   }
-  cache_set('training2_currency', $currency_ar, 'cache', REQUEST_TIME + (int) $settings['training2_currency_update_time']);
-  return TRUE;
 }
 
 /**
  * @return array/bool
- * Function return cache variable. If cache variable don't exist than try to define it,
- * if can't return FALSE.
+ * Function return cache variable. If cache variable don't exist than try to
+ *   define it, if can't return FALSE.
  */
 function _training2_load_from_cache() {
   $cache = cache_get('training2_currency', 'cache');// Try to load cache.
@@ -184,6 +162,49 @@ function _training2_load_from_cache() {
   return $cache;
 }
 
+/**
+ * @param $url
+ *
+ * @return array|bool
+ * Function pars $url address, and return array with currency, or if something happened
+ * return false
+ */
+function training2_http_get_currency_ar($url) {
+  $currency_ar = array();
+  // Load XML File.
+  $result = drupal_http_request($url);
+  if ($result->code == 200) {
+    $currency_xml = simplexml_load_string($result->data);
+    // Check if xml file is valid
+    if (
+      !isset ($currency_xml->Currency) ||
+      !isset ($currency_xml->Currency->CharCode) ||
+      !isset ($currency_xml->Currency->NumCode) ||
+      !isset ($currency_xml->Currency->Rate)
+    ) {
+      drupal_set_message(t('Error. XML file is not valid'), 'error');
+      return FALSE;
+    }
+    // Prepare array to put its to cache
+    foreach ($currency_xml->Currency as $Currency) {
+      $currency_ar[(int) $Currency->NumCode] = array(
+        'CharCode' => (string) $Currency->CharCode,
+        'Rate' => (float) $Currency->Rate,
+      );
+    }
+    return $currency_ar;
+  }
+  else {
+    drupal_set_message(
+      t('Error to connect to @url with message @err',
+        array(
+          '@err' => $result->status_message,
+          '@url' => $url,
+        )
+      ), 'error');
+    return FALSE;
+  }
+}
 
 /**
  * ========================TASK2.2==============================================
@@ -191,6 +212,9 @@ function _training2_load_from_cache() {
 
 /**
  * Implements hook_form_alter().
+ * @param $form
+ * @param $form_state
+ * @param $form_id
  */
 function training2_form_user_login_block_alter(&$form, &$form_state, $form_id) {
   // Settings of token auth.
@@ -216,4 +240,3 @@ function training2_form_user_login_block_alter(&$form, &$form_state, $form_id) {
     drupal_goto(current_path(), array('query' => drupal_get_query_parameters()));
   }
 }
-
