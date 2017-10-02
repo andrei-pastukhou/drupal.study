@@ -7,4 +7,4 @@ sites/*/private
 
 .idea
 .settings
-/.idea
+sites/all/modules/contrib
