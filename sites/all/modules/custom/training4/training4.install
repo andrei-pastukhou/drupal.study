@@ -46,19 +46,3 @@ function training4_schema() {
   return $schema;
 }
 
-/**
- * Implements hook_install()
- * Add db_table to database.
- * todo ask mentor about neccesserity install and uninstall scheme.
- */
-function training4_install() {
-  drupal_install_schema('training4_table');
-}
-
-/**
- * Implements hook_uninstall()
- * Delete db_table from Database
- */
-function training4_uninstall() {
-  drupal_uninstall_schema('training4_table');
-}

@@ -30,13 +30,16 @@ function training4_menu() {
     'title' => 'Edit Training4 record',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('training4_form', 1),
-    'access callback' => TRUE,
+    'access callback' => 'training4_check_owner_entity', // TODO: ask mentor about use true? or use callback function. notice callbacl function is already done -  training4_check_owner_entity($entity)
+    'access arguments' => array(1),
     'type' => MENU_CALLBACK,
   );
   $items['training4/%tr4_record/delete'] = array(
     'title' => 'Delete Training4 record',
     'page callback' => 'training4_delete',
     'page arguments' => array(1),
+    'access callback' => 'training4_check_owner_entity', // TODO: ask mentor about use true? or use callback function. notice callbacl function is already done -  training4_check_owner_entity($entity)
+    'access arguments' => array(1),
     'type' => MENU_CALLBACK,
   );
   return $items;
@@ -100,6 +103,7 @@ function training4_form($form, &$form_state, $tr4_record = NULL) {
     '#type' => 'textfield',
     '#default_value' => $tr4_record ? $tr4_record->type : '',
     '#required' => TRUE,
+    '#element_validate' => array('element_validate_integer_positive'),
   );
   $form['title'] = array(
     '#title' => t('Title'),
@@ -130,7 +134,6 @@ function training4_form($form, &$form_state, $tr4_record = NULL) {
   return $form;
 }
 
-
 /**
  * Submit event of form.
  * Function check owner, then check type of action (create new or edit
@@ -149,10 +152,7 @@ function training4_form_submit(&$form, &$form_state) {
         )
       )
     );
-    // Check for access to do this action.
-    if (!training4_check_owner_entity($entity)) {
-      drupal_access_denied();
-    }
+
     $entity->type = $form_state['values']['type'];
     $entity->title = $form_state['values']['title'];
     $entity->body = $form_state['values']['body'];
@@ -164,7 +164,7 @@ function training4_form_submit(&$form, &$form_state) {
     $entity = entity_create('training4_item',
       array(
         'uid' => (int) $user->uid,
-        'type' => (int) $form_state['values']['type'], // todo validation?
+        'type' => (int) $form_state['values']['type'],
         'title' => $form_state['values']['title'],
         'body' => $form_state['values']['body'],
       )
@@ -244,13 +244,8 @@ function training4_access($entity) {
  */
 function training4_delete($entity) {
   // Check owner for record, or admin.
-  if (training4_check_owner_entity($entity)) {
-    $entity->delete();
-    drupal_set_message(t('The record was successful deleted'), 'status');
-  }
-  else { // If user have no access to delete show message access denied.
-    drupal_access_denied();
-  }
+  $entity->delete();
+  drupal_set_message(t('The record was successful deleted'), 'status');
   drupal_goto('training4/list');
 }
 
@@ -283,18 +278,50 @@ function training4_check_owner_entity($entity = NULL) {
  * at module training4, then access will be denied.
  */
 function training4_node_access($node, $op, $account) {
-  global $user;
   $type = is_string($node) ? $node : $node->type;
-  if ($type == 'article') {
-    if ($op == 'view') {
-      $result = db_query('SELECT uid from {training4_table} GROUP BY uid');
-      while ($row = $result->fetchObject()) {
-        if ($user->uid == $row->uid) {
-          return NODE_ACCESS_IGNORE;
-        }
-      }
+  if ($type == 'article' && $op == 'view') {
+    if (!training4_check_access_if_user_save_message()) {
       return NODE_ACCESS_DENY;
     }
   }
   return NODE_ACCESS_IGNORE;
+}
+
+/**
+ * @param $build
+ * Implement hook_node_alter
+ * This hook call every time before show node to user.
+ * At these case we check if user have permissions to see this node (teaser) if
+ *   no - then stop "render" this node.
+ */
+
+function training4_node_view_alter(&$build) {
+  //Check view mode and item should be nodes and type of node should be articles.
+  if (($build['#view_mode'] == 'teaser') && ($build['#entity_type'] == 'node') && ($build['#bundle'] == 'article')) {
+    if (!training4_check_access_if_user_save_message()) {
+      $build = array();
+    }
+  }
+}
+
+/**
+ * @return bool
+ * Function return true if user save any message at this module, in opposite
+ *   case return false. It like check access function.
+ */
+function training4_check_access_if_user_save_message() {
+  global $user;
+  // Check if user is administrator, then always give him access
+  if (in_array('administrator', $user->roles)) {
+    return TRUE;
+  }
+  // Check id user save message at any time.
+  $result = db_query('SELECT uid from {training4_table} WHERE uid = :uid GROUP BY uid',
+    array(':uid' => $user->uid)
+  );
+  if ($result->fetchObject()) {
+    return TRUE;
+  }
+  // if any requires absent, than return FALSE, it like access deny.
+  return FALSE;
 }
