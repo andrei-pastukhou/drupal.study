@@ -1,0 +1,23 @@
+<?php
+
+/**
+* Implements hook_install().
+*/
+function training2_install() {
+// Default settings if not change any time.
+$default_setting = array(
+// Default time to update cache.
+'training2_currency_update_time' => 60,
+// Default numcode to show rates. Use next syntax 'numcode' => 'numcode' to enable,
+// 'numcode' => 0 to disable.
+'currency_checked' => array('978' => '978', '643' => '643', '840' => '840'),
+);
+variable_set('training2_settings', $default_setting);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function training2_uninstall() {
+  variable_del('training2_settings');
+}
