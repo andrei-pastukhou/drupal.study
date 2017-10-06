@@ -1,0 +1,8 @@
+name = "training7"
+description = "training module for task 7"
+core = 7.x
+dependencies[] = user
+dependencies[] = rules
+dependencies[] = pathrules
+version  = 1.0
+package = "Training"
