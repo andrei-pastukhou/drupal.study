@@ -1,0 +1,156 @@
+<?php
+
+/**
+ * @file training.module
+ */
+
+/**
+ *  Implement hook_menu
+ */
+function training6_menu() {
+  // Show page with table of file
+  $items['training6/page'] = array(
+    'page callback' => 'training6_page_content',
+    'access callback' => TRUE,
+    'title' => t('tr6_page'),
+  );
+  $items['training6/%ctools_js/click_link'] = array(
+    'title' => '',
+    'page callback' => 'training6_ajax_click_link_modal',
+    'page arguments' => array(1),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'delivery callback' => 'ajax_deliver',
+  );
+  return $items;
+}
+
+/**
+ * @return string
+ * Function return html page to url = training6/page.
+ */
+function training6_page_content() {
+
+  $output = training6_get_info_text();
+  $output .= '</br>';
+  // Show translation word task.
+  $output .= format_plural(rand(1, 100), '1 task', '@count tasks');
+  $output .= '</br>';
+  // Prepare settings for ctools.
+  ctools_include('ajax');
+  drupal_add_js(drupal_get_path(
+      'module',
+      'training6') . '/js/training6.js',
+    'file'
+  );
+
+  $output .= ctools_ajax_text_button('link', 'training6/nojs/click_link', '', '', 'use-ajax');
+  $form = drupal_get_form('training6_textarea_form');
+  $output .= drupal_render($form);
+  return $output;
+
+
+}
+
+/**
+ * @param $ajax
+ * Function call before show modal window.
+ * This function fill information to the modal window.
+ */
+function training6_ajax_click_link_modal($ajax) {
+  if ($ajax) {
+    ctools_include('ajax');
+    training6_ajax_put_string(training6_get_info_text());
+    $commands[] = array('command' => 'alert_message');
+    print ajax_render($commands);
+    drupal_exit();
+  }
+}
+
+/**
+ * @param $string
+ * Function add some text to drupal.settings['training6-string'] in js.
+ */
+function training6_ajax_put_string($string) {
+  drupal_add_js(
+    array(
+      'training6-string' => $string,
+    ),
+    'setting'
+  );
+}
+
+/**
+ * @return string
+ * Function return prepared string according with task 6.
+ */
+function training6_get_info_text() {
+  global $user;
+
+  $start_date = new DateObject(REQUEST_TIME);
+  $end_date = new DateObject();
+  $end_date->setDate((int) date_format($start_date, 'Y') + 1, 1, 1);
+  $diff = $end_date->difference($start_date, 'days');
+
+  $output = t('User "@user_name" registered at "@date_of_registration". ',
+    array(
+      '@user_name' => (isset($user->name)) ? $user->name : t('guest'),
+      '@date_of_registration' => (isset($user->created)) ? training6_get_user_registration_date() : t('unregistered'),
+    )
+  );
+  $output .= t('Day to New Year - ') .
+    format_plural($diff, '1 day', '@count days');
+  return $output;
+}
+
+function training6_get_user_registration_date($format = 'd F Y', $lng = NULL) {
+  global $user;
+  global $language;
+  (empty($lng)) ? $lng = $language->language : $lng;
+  if (isset($user->created)) {
+    $user_registered = new DateObject($user->created);
+    return date_format_date($user_registered, 'custom', $format, $lng);
+  }
+  return FALSE;
+}
+
+
+/**
+ * Form with textarea
+ */
+function training6_textarea_form($form, $form_state) {
+  $form = array();
+  $form['#prefix'] = '<div id="training6_wrapper_form">';
+  $form['#suffix'] = '</div>';
+  $form['textarea'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Text'),
+    '#description' => t('Input text for check security'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Check it!'),
+    '#ajax' => [
+      'callback' => 'training6_textarea_form_ajax_callback',
+      'wrapper' => 'test-ajax',
+    ],
+  );
+  return $form;
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ * Function call on ajax submit form
+ */
+function training6_textarea_form_ajax_callback($form, &$form_state) {
+  // If in textarea is text than transfer this text to js. And call js function to process this data.
+  if (!empty($form['textarea']['#value'])) {
+    ctools_include('ajax');
+    training6_ajax_put_string(check_plain($form['textarea']['#value']));
+    $commands[] = array('command' => 'change_textarea_to_text');
+    print ajax_render($commands);
+  }
+  drupal_exit();
+}
+
