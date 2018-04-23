@@ -1,0 +1,455 @@
+<?php
+
+/**
+ * @file training.module
+ */
+
+/**
+ *  Implement hook_menu
+ */
+function training5_menu() {
+  // Show page with table of file
+  $items['training5/files'] = [
+    'page callback' => 'training5_files_content',
+    'access callback' => TRUE,
+    'title' => t('Files'),
+  ];
+  // Show modal window with form to upload file.
+  $items['training5/%ctools_js/upload_file'] = array(
+    'page callback' => 'training5_ajax_callback',
+    'page arguments' => array(1),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'delivery callback' => 'ajax_deliver',
+    'theme callback' => 'ajax_base_page_theme',
+  );
+  $items['training5/currency_rate_batch'] = array(
+    'title' => 'Batch process',
+    'page callback' => 'training5_batch_page_content_callback',
+    'access callback' => TRUE,
+  );
+  return $items;
+}
+
+/**
+ * Implement hook_file_download().
+ */
+function training5_file_download($uri) {
+  // Check if user already upload any file, then he have possibility to download
+  // every file. If not, than setup message and show page access denied.
+  global $user;
+  $users_file = db_query("SELECT * FROM {file_managed} WHERE (uid = :uid) LIMIT 1", array(':uid' => $user->uid))->fetchObject();
+  if (empty($users_file)) {
+    drupal_set_message(t('For downloading file, first upload any file.'), 'warning');
+    return -1;
+  }
+  else {
+    $file = db_query("SELECT * FROM {file_managed} WHERE (uri = :uri)", [':uri' => $uri])->fetchObject();
+    $headers = file_get_content_headers($file);
+    return $headers;
+  }
+}
+
+/**
+ * @return string
+ * Function implement page_callback of trainig5/files menu
+ */
+function training5_files_content() {
+  $html_response = ''; // Variable use to return html page.
+  // Switch on, and include ctools
+  ctools_include('modal');
+  ctools_include('ajax');
+  ctools_modal_add_js();
+  drupal_add_js(array(
+    'training5-modal-style' => array(
+      'modalSize' => array(
+        'type' => 'fixed',
+        'width' => 450,
+        'height' => 250,
+      ),
+      'modalOptions' => array(
+        'opacity' => .7,
+        'background-color' => '#000000',
+      ),
+      'closeText' => t(''),
+      'loadingText' => t(''),
+      'animation' => 'fadeIn',
+      'animationSpeed' => 'fast',
+    ),
+  ), 'setting');
+  // Header of table.
+  $header_table = array(
+    t('#'),
+    t('User ID'),
+    t('Path'),
+    t('Status'),
+    t('Link to download'),
+  );
+  // Send to drupal.settings variable with all table's row.
+  _training5_prepare_table_setting_ajax();
+  $html_response .= ctools_modal_text_button(
+    t(' + Upload new file'),
+    'training5/nojs/upload_file',
+    'alt',
+    'ctools-modal-training5-modal-style'
+  );
+  $html_response .= theme('table', array(
+    'caption' => t('Files'),
+    'attributes' => array('id' => 'training5-table-files'),
+    'header' => $header_table,
+
+  ));
+
+  return $html_response;
+}
+
+/**
+ * Ajax menu callback.
+ */
+function training5_ajax_callback($ajax) {
+  if ($ajax) {
+    ctools_include('ajax');
+    ctools_include('modal');
+
+    // _training5_prepare_table_setting_ajax();
+    $form_state = array(
+      'ajax' => TRUE,
+      'title' => t('Upload new files'),
+    );
+    // Use ctools to generate ajax instructions for the browser to create
+    // a form in a modal popup.
+    $output = ctools_modal_form_wrapper(
+      'training5_upload_form',
+      $form_state
+    );
+    // Return the ajax instructions to the browser via ajax_render().
+    print ajax_render($output);
+    //$output = ctools_modal_command_dismiss();
+    //print ajax_render($output);
+    drupal_exit();
+  }
+  return drupal_get_form('training5_upload_form');
+}
+
+/**
+ * Upload form
+ */
+function training5_upload_form($form, $form_state) {
+  $form = array();
+  $form['file'] = array(
+    '#type' => 'managed_file',
+    '#title' => t('Upload file.'),
+    '#description' => t('Choose file to upload.'),
+    '#upload_location' => 'private://training5_files/',
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+  return $form;
+}
+
+/**
+ * @return array
+ * Function return structured array which consist of row for  filetable.
+ */
+function get_list_file_for_table() {
+  $rows_table = array();
+  $files = db_query('SELECT * FROM {file_managed}');
+  while ($file = $files->fetchObject()) {
+    $stream = file_stream_wrapper_get_instance_by_uri($file->uri);
+    $rows_table[] = array(
+      'data' => array(
+        'id' => '',
+        'user_id' => $file->uid,
+        'path' => $file->uri,
+        'status' => $file->status,
+        'url' => l(t('download'), $stream->getExternalUrl()),
+      ),
+    );
+  }
+  return $rows_table;
+}
+
+/**
+ * function prepare/add all js scripts (with different settings) for work
+ * module.
+ */
+function _training5_prepare_table_setting_ajax() {
+  global $user;
+  $rows_table = get_list_file_for_table();
+  drupal_add_js(array('training5_user_id' => $user->uid), 'setting');
+  drupal_add_js(array('training5_file_rows_table' => $rows_table), 'setting');
+  drupal_add_js(drupal_get_path(
+      'module',
+      'training5') . '/js/training5.js',
+    'file'
+  );
+  drupal_add_css(
+    drupal_get_path('module', 'training5') . '/css/training5.css',
+    'file'
+  );
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ * Function is called when action submit happened.
+ */
+function training5_upload_form_submit($form, &$form_state) {
+  // Save new file
+  if ($form_state['values']['file']) {
+    $file = file_load($form_state['values']['file']);
+    $file->status = FILE_STATUS_PERMANENT;
+    file_save($file);
+  }
+  // Update variable which consist rows for filetable
+  $rows_table = get_list_file_for_table();
+  drupal_add_js(
+    array('training5_file_rows_table' => $rows_table),
+    'setting'
+  );
+  // Close modal window
+  $commands[] = ctools_modal_command_dismiss();
+  print ajax_render($commands);
+  drupal_exit();
+}
+
+/**
+ * =============================================================================
+ * ==============================PART2 of TASK5=================================
+ * =============================================================================
+ */
+
+
+/**
+ * Title changer form
+ * Allows to start Batch operations
+ */
+function training5_batch_form() {
+  $form = array();
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Start batch'),
+  );
+
+  return $form;
+}
+
+/**
+ * Submit callback Batch form
+ */
+function training5_batch_form_submit($form, &$form_state) {
+  // Load array with currency/
+  $currency_ar = training5_http_get_currency_ar('http://www.nbrb.by/Services/XmlExRates.aspx');
+
+  /**
+   * DEBUG INFORMATION
+   *  Uncomment next code's line for multiplication count of batch process.
+   *   for ($i = 0; $i <100; $i++)
+   */
+
+  // Create array with operations.
+  foreach ($currency_ar as $num_code => $currency) {
+    $operations[] = array(
+      'training5_batch_process_callback',
+      array((array('NumCode' => $num_code) + $currency)),
+    );
+  }
+  $batch = array(
+    'title' => t('Currency rate processing'),
+    'operations' => $operations,
+    'finished' => 'training5_batch_finished_callback',
+  );
+  batch_set($batch);
+}
+
+
+/**
+ * Implement hook_entity_info()
+ */
+function training5_entity_info() {
+  return array(
+    'training5_item' => array(
+      'label' => t('Training5 currency'),
+      'entity class' => 'Entity',
+      'controller class' => 'EntityAPIController',
+      'base table' => 'training5_currency',
+      'fieldable' => FALSE,
+      'entity keys' => array(
+        'id' => 'num_code',
+      ),
+      'bundle keys' => array(),
+      'bundles' => array(),
+      'load hook' => 'training5_item_load',
+      'view modes' => array(),
+      'label callback' => 'entity_class_label',
+      'uri callback' => 'entity_class_uri',
+      'module' => 'training5',
+    ),
+  );
+}
+
+/**
+ * @param $param
+ * @param $context
+ * Function is batch's process.
+ * This function will call amount size of array operation
+ */
+function training5_batch_process_callback($param, &$context) {
+  // Check if it start of batch, than mark progress = 0.
+  if (empty($context['results'])) {
+    $context['results']['processed'] = 0;
+  }
+  // Check that we have parameters.
+  if (!empty ($param)) {
+    $entity_currency = reset(entity_load('training5_item', array((int) $param['NumCode'])));
+    // Check that we have load entity, if no than create a new entity.
+    // This case show, that we have new currency which absent in DB.
+    if (empty($entity_currency)) {
+      $entity_currency = entity_create('training5_item', array());
+      $entity_currency->num_code = (int) $param['NumCode'];
+    }
+    // Set parameters to entity.
+    $entity_currency->rate = $param['Rate'];
+    $entity_currency->char_code = (string) $param['CharCode'];
+    $entity_currency->update_time = REQUEST_TIME;
+    $entity_currency->save(); // Save entitu to DB.
+  }
+  $context['results']['processed']++; // Increment progress.
+}
+
+/**
+ * Finish callback for Batch
+ */
+function training5_batch_finished_callback($success, $results, $operations) {
+  if ($success) {
+    $message = format_plural($results['processed'], 'One Rate processed.', '@count Rates processed.');
+  }
+  else {
+    $message = t('Finished with an error.');
+  }
+  drupal_set_message($message);
+}
+
+/**
+ * @param $url
+ *
+ * @return array|bool
+ * Function pars $url adress, and return array with currency, or if smth happend
+ * return false
+ */
+function training5_http_get_currency_ar($url) {
+  $currency_ar = array();
+  // Load XML File.
+  $result = drupal_http_request($url);
+  if ($result->code == 200) {
+    $currency_xml = simplexml_load_string($result->data);
+    // Prepare array to put its to cache.
+    foreach ($currency_xml->Currency as $Currency) {
+      $currency_ar[(int) $Currency->NumCode] = array(
+        'CharCode' => (string) $Currency->CharCode,
+        'Rate' => (float) $Currency->Rate,
+      );
+    }
+    return $currency_ar;
+  }
+  else {
+    drupal_set_message(
+      t('Error to connect to @url with message @err',
+        array(
+          '@err' => $result->status_message,
+          '@url' => $url,
+        )
+      ), 'error');
+    return FALSE;
+  }
+}
+
+/**
+ * @return array|mixed
+ * Function is impkement page callback of training5/currency_rate_batch
+ */
+function training5_batch_page_content_callback() {
+  // Render form with
+  return drupal_get_form('training5_batch_form');
+}
+
+/**
+ * Implement hook_views_data
+ */
+function training5_views_data() {
+
+  $data['training5_currency']['table']['group'] = t('Training5 currency');
+  // Describe base field. (Primery key).
+  $data['training5_currency']['table']['base'] = array(
+    'field' => 'num_code', // This is the identifier field for the view.
+    'title' => t('Table of currency'),
+    'help' => t('Some words about help.'),
+    'weight' => -10,
+  );
+  // Describe numeric field. Num Code.
+  $data['training5_currency']['num_code'] = array(
+    'title' => t('Numeric code'),
+    'help' => t('Numeric code according with international standart.'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  // Describe text field. Char code.
+  $data['training5_currency']['char_code'] = array(
+    'title' => t('Char code'),
+    'help' => t('Char code according with international standart.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE, // This is use by the table display plugin.
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+  // Describe numeric field. Rate.
+  $data['training5_currency']['rate'] = array(
+    'title' => t('Rate'),
+    'help' => t('Rate to BYN.'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  // Describe timestamp field. Update time.
+  $data['training5_currency']['update_time'] = array(
+    'title' => t('Timestamp field'),
+    'help' => t('Just a timestamp field.'),
+    'field' => array(
+      'handler' => 'views_handler_field_date',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort_date',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_date',
+    ),
+  );
+  return $data;
+}

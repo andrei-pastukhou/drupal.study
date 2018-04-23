@@ -1,0 +1,6 @@
+.tr5_user_file {
+  background : #9bff9b;
+}
+#training5-table-files tr > *:nth-child(2) {
+  display: none;
+}

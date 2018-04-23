@@ -1,0 +1,60 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function training5_schema() {
+  $schema['training5_currency'] = array(
+    'description' => 'Table of database for module training5, consist of currency\'s rates',
+    'fields' => array(
+      'num_code' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Currencys code according with international standart',
+      ),
+      'char_code' => array(
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'length' => 5, // todo check max length of charcode
+        'default' => '',
+        'description' => 'Currencys char code (name) according with international standart',
+      ),
+      'rate' => array(
+        'type' => 'float',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Rate of currency',
+      ),
+      'update_time' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp of updating',
+      ),
+    ),
+    'unique keys' => array(
+      'num_code' => array('num_code'),
+    ),
+    'primary key' => array('num_code'),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_install()
+ * Add db_table to database.
+ * todo ask mentor about neccesserity instal and uninstall scheme.
+ */
+function training5_install() {
+  drupal_install_schema('training5_currency');
+}
+
+/**
+ * Implements hook_uninstall()
+ * Delete db_table from Database
+ */
+function training5_uninstall() {
+  drupal_uninstall_schema('training5_currency');
+}
