@@ -1,0 +1,327 @@
+<?php
+/**
+ * @file training.module
+ */
+
+/**
+ *  Implement hook_menu
+ */
+function training4_menu() {
+  // Show page with table of file
+  $items['training4'] = array(
+    'page callback' => 'training4_page_content_callback',
+    'access callback' => TRUE,
+    'title' => t('tr4_page'),
+  );
+  $items['training4/list'] = array(
+    'title' => t('Training4 list'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+  $items['training4/add'] = array(
+    'title' => t('Add record to Training4'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('training4_form', FALSE),
+    'access callback' => TRUE,
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+  $items['training4/%tr4_record/edit'] = array(
+    'title' => 'Edit Training4 record',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('training4_form', 1),
+    'access callback' => 'training4_check_owner_entity', // TODO: ask mentor about use true? or use callback function. notice callbacl function is already done -  training4_check_owner_entity($entity)
+    'access arguments' => array(1),
+    'type' => MENU_CALLBACK,
+  );
+  $items['training4/%tr4_record/delete'] = array(
+    'title' => 'Delete Training4 record',
+    'page callback' => 'training4_delete',
+    'page arguments' => array(1),
+    'access callback' => 'training4_check_owner_entity', // TODO: ask mentor about use true? or use callback function. notice callbacl function is already done -  training4_check_owner_entity($entity)
+    'access arguments' => array(1),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Preprocessing %tr4_record (page arguments), use like identificator
+ *
+ * @return OBJECT/FALSE
+ */
+function tr4_record_load($id) {
+  $result = entity_load('training4_item', array($id));
+  return $result ? reset($result) : FALSE;
+}
+
+/**
+ * Implement hook_entity_info()
+ */
+function training4_entity_info() {
+  return array(
+    'training4_item' => array(
+      'label' => t('Training4 entity'),
+      'entity class' => 'Entity',
+      'controller class' => 'EntityAPIController',
+      'base table' => 'training4_table',
+      'fieldable' => FALSE,
+      'entity keys' => array(
+        'id' => 'id',
+        'label' => 'title',
+      ),
+      'bundle keys' => array(),
+      'bundles' => array(),
+      'load hook' => 'training4_item_load',
+      'view modes' => array(),
+      'label callback' => 'entity_class_label',
+      'uri callback' => 'entity_class_uri',
+      'module' => 'training4',
+      //'access callback' => 'training4_access',
+    ),
+  );
+}
+
+/**
+ * Implements hook_entity_property_info_alter().
+ * NOT USE.
+ */
+function training4_entity_property_info_alter(&$info) {
+  $info['training4_item']['properties']['uid']['type'] = 'user';
+}
+
+
+/**
+ * implement hook_form
+ * Form to add/delete record in training4 module
+ */
+function training4_form($form, &$form_state, $tr4_record = NULL) {
+  // var_dump(func_get_args());
+  $form['type'] = array(
+    '#title' => t('Type'),
+    '#description' => t('Descriprion for type\'s label'),
+    '#type' => 'textfield',
+    '#default_value' => $tr4_record ? $tr4_record->type : '',
+    '#required' => TRUE,
+    '#element_validate' => array('element_validate_integer_positive'),
+  );
+  $form['title'] = array(
+    '#title' => t('Title'),
+    '#description' => t('Descriprion for title\'s label'),
+    '#type' => 'textfield',
+    '#default_value' => $tr4_record ? $tr4_record->title : '',
+    '#maxlength' => 100,
+    '#required' => TRUE,
+  );
+  $form['body'] = array(
+    '#title' => t('Body'),
+    '#description' => t('Descriprion for Body\'s label'),
+    '#type' => 'textarea',
+    '#default_value' => $tr4_record ? $tr4_record->body : '',
+    '#required' => TRUE,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+
+  if ($tr4_record) {
+    $form['id'] = array(
+      '#type' => 'value',
+      '#value' => $tr4_record->id,
+    );
+  }
+  return $form;
+}
+
+/**
+ * Submit event of form.
+ * Function check owner, then check type of action (create new or edit
+ * existing), and then if all requires done create or update training4_item
+ * record.
+ */
+function training4_form_submit(&$form, &$form_state) {
+  global $user;
+  // Edit.
+  if (isset($form_state['values']['id'])) {
+    $entity = reset(
+      entity_load(
+        'training4_item',
+        array(
+          (int) $form_state['values']['id'],
+        )
+      )
+    );
+
+    $entity->type = $form_state['values']['type'];
+    $entity->title = $form_state['values']['title'];
+    $entity->body = $form_state['values']['body'];
+    if ($entity->save()) {
+      drupal_set_message(t('The record was successful updated'), 'status');
+    }
+  }
+  else { // Add.
+    $entity = entity_create('training4_item',
+      array(
+        'uid' => (int) $user->uid,
+        'type' => (int) $form_state['values']['type'],
+        'title' => $form_state['values']['title'],
+        'body' => $form_state['values']['body'],
+      )
+    );
+    if ($entity->save()) {
+      drupal_set_message(t('The record was successful created'), 'status');
+    }
+  }
+  drupal_goto('training4/list');
+}
+
+/**
+ *  Function return html data to trainig4/list page
+ */
+function training4_page_content_callback() {
+
+  // We are going to output the results in a table with a nice header.
+  $header = array(
+    // The header gives the table the information it needs in order to make
+    // the query calls for ordering. TableSort uses the field information
+    // to know what database column to sort by.
+    array('data' => t('#id'), 'field' => 't.id'),
+    array('data' => t('User_id'), 'field' => 't.uid'),
+    array('data' => t('Type'), 'field' => 't.type'),
+    array('data' => t('Title'), 'field' => 't.title'),
+    array('data' => t('Body'), 'field' => 't.body'),
+    array('data' => t('Links')),
+  );
+
+  // Using the TableSort Extender is what tells the query object that we are
+  // sorting.
+  $query = db_select('training4_table', 't')
+    ->extend('TableSort')// Switch on Table sorting.
+    ->extend('PagerDefault')// Switch on Paginator.
+    ->limit(5); // Rows per page.
+  $query->fields('t');
+
+  $result = $query
+    ->orderByHeader($header)
+    ->execute();
+
+  $rows = array();
+
+  foreach ($result as $row) {
+    // Fill array with links to control our records (edit, delete).
+    // If user don't owner of record then links will not show.
+    if (training4_check_owner_entity($row)) {
+      $links_ar = array(
+        l(t('edit'), 'training4/' . $row->id . '/edit'),
+        l(t('delete'), 'training4/' . $row->id . '/delete'),
+      );
+    }
+    else {
+      $links_ar = array();
+    }
+    // Fill array with data about training4_item.
+    $rows[] = array('data' => (array) $row + array(implode(' | ', $links_ar)));
+  }
+  // Build the table for output.
+  $build['tablesort_table'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+  );
+  // Attach the pager theme (paginator).
+  $build['pager_pager'] = array('#theme' => 'pager');
+  return $build;
+}
+
+// Not use.
+function training4_access($entity) {
+  return TRUE;
+}
+
+/**
+ * Delete training4_item
+ */
+function training4_delete($entity) {
+  // Check owner for record, or admin.
+  $entity->delete();
+  drupal_set_message(t('The record was successful deleted'), 'status');
+  drupal_goto('training4/list');
+}
+
+/**
+ * @param null $entity
+ *
+ * @return bool
+ * Function check access, if user is owner of record or is administrator, then
+ * function return TRUE, at opposite require return FALSE.
+ */
+function training4_check_owner_entity($entity = NULL) {
+  global $user;
+  if ($entity) {
+    if (($entity->uid == $user->uid) || in_array('administrator', $user->roles)) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Implement hook_node_access
+ *
+ * @param $node
+ * @param $op
+ * @param $account
+ *
+ * @return string
+ * Function control access to standart node article. If user never save message
+ * at module training4, then access will be denied.
+ */
+function training4_node_access($node, $op, $account) {
+  $type = is_string($node) ? $node : $node->type;
+  if ($type == 'article' && $op == 'view') {
+    if (!training4_check_access_if_user_save_message()) {
+      return NODE_ACCESS_DENY;
+    }
+  }
+  return NODE_ACCESS_IGNORE;
+}
+
+/**
+ * @param $build
+ * Implement hook_node_alter
+ * This hook call every time before show node to user.
+ * At these case we check if user have permissions to see this node (teaser) if
+ *   no - then stop "render" this node.
+ */
+
+function training4_node_view_alter(&$build) {
+  //Check view mode and item should be nodes and type of node should be articles.
+  if (($build['#view_mode'] == 'teaser') && ($build['#entity_type'] == 'node') && ($build['#bundle'] == 'article')) {
+    if (!training4_check_access_if_user_save_message()) {
+      $build = array();
+    }
+  }
+}
+
+/**
+ * @return bool
+ * Function return true if user save any message at this module, in opposite
+ *   case return false. It like check access function.
+ */
+function training4_check_access_if_user_save_message() {
+  global $user;
+  // Check if user is administrator, then always give him access
+  if (in_array('administrator', $user->roles)) {
+    return TRUE;
+  }
+  // Check id user save message at any time.
+  $result = db_query('SELECT uid from {training4_table} WHERE uid = :uid GROUP BY uid',
+    array(':uid' => $user->uid)
+  );
+  if ($result->fetchObject()) {
+    return TRUE;
+  }
+  // if any requires absent, than return FALSE, it like access deny.
+  return FALSE;
+}
