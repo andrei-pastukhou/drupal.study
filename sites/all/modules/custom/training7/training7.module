@@ -1,0 +1,163 @@
+<?php
+
+/**
+ * @file training.module
+ */
+
+define('TRAINING7_LOTTERY_CODE_WIN', 1234567); // Secrete key, use for communicate site with lottery server.
+define('TRAINING7_COMPLEX_LOTTERY', 8); // It's value to use in a function rand(), max random value.
+
+/**
+ *  Implement hook_menu
+ */
+function training7_menu() {
+  // Show page with table of file
+  $items['training7/lottery'] = array(
+    'page callback' => 'training7_lottery_content',
+    'access callback' => 'user_is_logged_in',
+    'title' => t('lottery'),
+  );
+  return $items;
+}
+
+/**
+ * @return string
+ * Function return html page to url = training6/page.
+ */
+function training7_lottery_content() {
+  global $base_url;
+  $lottery_user_number = rand(1, TRAINING7_COMPLEX_LOTTERY); // Generate random value for user/
+  $output = ''; // Initialization variable, which will use for return.
+  // Check user's win already.
+  if (!training7_check_winner_cache()) {
+    // Call check result function in remote server.
+    $lottery_result = xmlrpc($base_url . '/xmlrpc.php', array('training7.check_lottery_result' => array($lottery_user_number)));
+    if (is_array($lottery_result)) { // Check response from server.
+      if ($lottery_result['lottery_result'] == TRAINING7_LOTTERY_CODE_WIN) { // Check, probably win.
+        training7_rebuild_cache(TRUE, $lottery_result['server_value'], $lottery_result['user_value']);
+        // Important. There is need reload page. Because the event based on drupal initialize
+        // if user win at this moment event and condition are already called, and message will not show.
+        // But after reload page it will work correctly.
+        drupal_goto(current_path());
+        return FALSE;
+      }
+      else { // Do if loose.
+        training7_rebuild_cache(FALSE, $lottery_result['server_value'], $lottery_result['user_value']);
+      }
+    }
+  }
+
+  // Use to debug.
+  $cache = cache_get('training7_lottery');
+  $header_table = array(
+    t('User ID'),
+    t('Win'),
+    t('#server_key'),
+    t('#user_key'),
+    t('Time'),
+  );
+  $output .= theme('table',
+    array(
+      'caption' => t('Lottery table'),
+      'header' => $header_table,
+      'rows' => $cache->data,
+    )
+  );
+  return $output;
+}
+
+/**
+ * Function add to cache information about user's try to win. (or save response
+ * of lottery server).
+ *
+ * @param $win
+ * @param $server_key
+ * @param $user_key
+ */
+function training7_rebuild_cache($win, $server_key, $user_key) {
+  global $user;
+  $cache = cache_get('training7_lottery');
+  $tmp_ar = array();
+  if ($cache) {
+    $tmp_ar = $cache->data;
+  }
+  $tmp_ar[] = array(
+    'user_id' => $user->uid,
+    'lottery_win' => $win,
+    'server_value' => $server_key,
+    'user_value' => $user_key,
+    'lottery_time' => REQUEST_TIME,
+  );
+  cache_set('training7_lottery', $tmp_ar);
+}
+
+/** Function search in a cache, if user win return array with information, if user
+ * not win return false/
+ *
+ * @return bool/array
+ */
+function training7_check_winner_cache() {
+  global $user;
+  $cache = cache_get('training7_lottery');
+  if ($cache) {
+    foreach ($cache->data as $key => $val) {
+      if ($val['lottery_win'] == TRUE && $val['user_id'] == $user->uid) {
+        return $cache->data[$key];
+      }
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Implement hook_xmlrpc()
+ *
+ * @return array
+ */
+function training7_xmlrpc() {
+  return array(
+    array(
+      'training7.check_lottery_result',
+      '_training7_set_lottery_result',
+      array('struct', 'int'),
+      t('return result of lottery'),
+    ),
+  );
+}
+
+/**
+ * Function return array with result of lottery.
+ *
+ * @param $user_value
+ *
+ * @return array
+ */
+function _training7_set_lottery_result($user_value) {
+
+  $check_lottery_number = rand(1, TRAINING7_COMPLEX_LOTTERY);
+  $result_lottery = ($user_value == $check_lottery_number) ? TRAINING7_LOTTERY_CODE_WIN : FALSE;
+  return array(
+    'lottery_result' => $result_lottery,
+    'server_value' => $check_lottery_number,
+    'user_value' => $user_value,
+  );
+}
+
+/**
+ * Function return array with object to use it in tokens.
+ *
+ * @return array
+ */
+function _training7_fill_lottery_object() {
+  $return_ar = array(
+    'lottery' => (object) array(
+      'lucky_number' => 'none',
+      'timestamp' => '0',
+    ),
+  );
+  if ($winner_ar = training7_check_winner_cache()) {
+    $return_ar['lottery']->lucky_number = $winner_ar['server_value'];
+    $return_ar['lottery']->timestamp = $winner_ar['lottery_time'];
+  }
+  return $return_ar;
+}
