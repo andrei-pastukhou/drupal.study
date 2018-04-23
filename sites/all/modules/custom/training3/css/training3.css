@@ -1,0 +1,6 @@
+.tr3_user_file {
+  background : #9bff9b;
+}
+#training3-table-files tr > *:nth-child(2) {
+  display: none;
+}

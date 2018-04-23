@@ -1,0 +1,210 @@
+<?php
+/**
+ * @file training.module
+ */
+
+/**
+ *  Implement hook_menu
+ */
+function training3_menu() {
+  // Show page with table of file
+  $items['training3/files'] = [
+    'page callback' => 'training3_files_content',
+    'access callback' => TRUE,
+    'title' => t('Files'),
+  ];
+  // Show modal window with form to upload file.
+  $items['training3/%ctools_js/upload_file'] = array(
+    'page callback' => 'training3_ajax_callback',
+    'page arguments' => array(1),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'delivery callback' => 'ajax_deliver',
+    'theme callback' => 'ajax_base_page_theme',
+  );
+  return $items;
+}
+
+/**
+ * Implement hook_file_download().
+ */
+function training3_file_download($uri) {
+  // Check if user already upload any file, then he have possibility to download
+  // every file. If not, than setup message and show page access denied.
+  global $user;
+  $users_file = db_query("SELECT * FROM {file_managed} WHERE (uid = :uid) LIMIT 1", array(':uid' => $user->uid))->fetchObject();
+  if (empty($users_file)) {
+    drupal_set_message(t('For downloading file, first upload any file.'), 'warning');
+    return -1;
+  }
+  $file = db_query("SELECT * FROM {file_managed} WHERE (uri = :uri)", [':uri' => $uri])->fetchObject();
+  $headers = file_get_content_headers($file);
+  return $headers;
+}
+
+/**
+ * @return string
+ * Function implement page_callback of trainig3/files menu
+ */
+function training3_files_content() {
+  $html_response = ''; // Variable use to return html page.
+  // Switch on, and include ctools
+  ctools_include('modal');
+  ctools_include('ajax');
+  ctools_modal_add_js();
+  drupal_add_js(array(
+    'training3-modal-style' => array(
+      'modalSize' => array(
+        'type' => 'fixed',
+        'width' => 450,
+        'height' => 250,
+      ),
+      'modalOptions' => array(
+        'opacity' => .7,
+        'background-color' => '#000000',
+      ),
+      'closeText' => t(''),
+      'loadingText' => t(''),
+      'animation' => 'fadeIn',
+      'animationSpeed' => 'fast',
+    ),
+  ), 'setting');
+  // Header of table.
+  $header_table = array(
+    t('#'),
+    t('User ID'),
+    t('Path'),
+    t('Status'),
+    t('Link to download'),
+  );
+  // Send to drupal.settings variable with all table's row.
+  _training3_prepare_table_setting_ajax();
+  $html_response .= ctools_modal_text_button(
+    t(' + Upload new file'),
+    'training3/nojs/upload_file',
+    'alt',
+    'ctools-modal-training3-modal-style'
+  );
+  $html_response .= theme('table',array(
+    'caption' => t('Files'),
+    'attributes' => array('id' => 'training3-table-files'),
+    'header' => $header_table,
+
+  ));
+
+  return $html_response;
+}
+
+/**
+ * Ajax menu callback.
+ */
+function training3_ajax_callback($ajax) {
+  if ($ajax) {
+    ctools_include('ajax');
+    ctools_include('modal');
+
+   // _training3_prepare_table_setting_ajax();
+    $form_state = array(
+      'ajax' => TRUE,
+      'title' => t('Upload new files'),
+    );
+    // Use ctools to generate ajax instructions for the browser to create
+    // a form in a modal popup.
+    $output = ctools_modal_form_wrapper(
+      'training3_upload_form',
+      $form_state
+    );
+    // Return the ajax instructions to the browser via ajax_render().
+    print ajax_render($output);
+    //$output = ctools_modal_command_dismiss();
+    //print ajax_render($output);
+    drupal_exit();
+  }
+  return drupal_get_form('training3_upload_form');
+}
+
+/**
+ * Upload form
+ */
+function training3_upload_form($form, $form_state) {
+  $form = array();
+  $form['file'] = array(
+    '#type' => 'managed_file',
+    '#title' => t('Upload file.'),
+    '#description' => t('Choose file to upload.'),
+    '#upload_location' => 'private://training3_files/',
+  );
+  $form['submit'] = array (
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+  return $form;
+}
+
+/**
+ * @return array
+ * Function return structured array which consist of row for  filetable.
+ */
+function get_list_file_for_table() {
+  $rows_table = array();
+  $files = db_query('SELECT * FROM {file_managed} WHERE status = 1');
+  while ($file = $files->fetchObject()) {
+    $stream = file_stream_wrapper_get_instance_by_uri($file->uri);
+    $rows_table[] = array(
+      'data' => array(
+        'id' => '',
+        'user_id' => $file->uid,
+        'path' => $file->uri,
+        'status' =>$file->status,
+        'url' => l(t('download'),$stream->getExternalUrl()),
+      ),
+    );
+  }
+  return $rows_table;
+}
+
+/**
+ * function prepare/add all js scripts (with different settings) for work module.
+ */
+function _training3_prepare_table_setting_ajax() {
+  global $user;
+  $rows_table = get_list_file_for_table();
+  drupal_add_js(array('training3_user_id' => $user->uid), 'setting');
+  drupal_add_js(array('training3_file_rows_table' => $rows_table), 'setting');
+  drupal_add_js(drupal_get_path(
+    'module',
+    'training3') .'/js/training3.js',
+    'file'
+  );
+  drupal_add_css(
+    drupal_get_path('module', 'training3') .'/css/training3.css',
+    'file'
+  );
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ * Function is called when action submit happened.
+ */
+function training3_upload_form_submit($form, &$form_state) {
+
+  // Save new file
+  if ($form_state['values']['file']) {
+    $file = file_load($form_state['values']['file']);
+    $file->status = FILE_STATUS_PERMANENT;
+    file_save($file);
+    // Update variable which consist rows for filetable
+    $rows_table = get_list_file_for_table();
+    drupal_add_js(array('training3_file_rows_table' => $rows_table),'setting');
+    // Comand for redraw table.
+    $commands[] = array('command' => 'ajax_submit_form');
+  }
+
+  // Close modal window
+    $commands[] = ctools_modal_command_dismiss();
+    print ajax_render($commands);
+    drupal_exit();
+
+}
+

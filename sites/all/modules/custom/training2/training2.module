@@ -23,6 +23,7 @@ function training2_block_info() {
  */
 function training2_block_configure() {
   $settings = variable_get('training2_settings');
+
   if (empty ($settings)) {
     drupal_set_message(t('Error to get variable with settings, please reinstall module'), 'error');
     return FALSE;
@@ -119,7 +120,6 @@ function training2_block_view() {
 
   return $data;
 }
-
 
 /**
  * @return bool
@@ -240,4 +240,3 @@ function training2_form_user_login_block_alter(&$form, &$form_state, $form_id) {
     drupal_goto(current_path(), array('query' => drupal_get_query_parameters()));
   }
 }
-
